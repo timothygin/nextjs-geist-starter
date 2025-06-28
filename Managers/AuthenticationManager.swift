@@ -3,6 +3,7 @@ import Foundation
 enum AuthenticationError: LocalizedError {
     case invalidCredentials
     case networkError
+    case invalidEmail
     
     var errorDescription: String? {
         switch self {
@@ -10,24 +11,50 @@ enum AuthenticationError: LocalizedError {
             return "The email or password is incorrect."
         case .networkError:
             return "A network error occurred. Please try again later."
+        case .invalidEmail:
+            return "Please enter a valid email address."
         }
     }
 }
 
-final class AuthenticationManager {
+@MainActor
+final class AuthenticationManager: ObservableObject {
     static let shared = AuthenticationManager()
+    
+    @Published private(set) var isAuthenticated = false
+    @Published private(set) var isLoading = false
+    
     private init() {}
     
-    /// Simulates an asynchronous authentication process.
-    func authenticate(email: String, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
-        // Simulate networking delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            // Dummy credentials for simulation:
-            if email.lowercased() == "test@example.com" && password == "password" {
-                completion(.success(()))
-            } else {
-                completion(.failure(AuthenticationError.invalidCredentials))
-            }
+    /// Validates email format
+    private func isValidEmail(_ email: String) -> Bool {
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPred = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+        return emailPred.evaluate(with: email)
+    }
+    
+    /// Modern async/await authentication process
+    func authenticate(email: String, password: String) async throws {
+        guard isValidEmail(email) else {
+            throw AuthenticationError.invalidEmail
         }
+        
+        isLoading = true
+        defer { isLoading = false }
+        
+        // Simulate network request
+        try await Task.sleep(nanoseconds: 1_500_000_000) // 1.5 seconds
+        
+        // Dummy credentials for simulation:
+        if email.lowercased() == "test@example.com" && password == "password" {
+            isAuthenticated = true
+        } else {
+            throw AuthenticationError.invalidCredentials
+        }
+    }
+    
+    /// Signs out the current user
+    func signOut() {
+        isAuthenticated = false
     }
 }
