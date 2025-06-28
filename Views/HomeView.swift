@@ -1,40 +1,107 @@
 import SwiftUI
 
 struct HomeView: View {
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        VStack(spacing: 20) {
-            Text("Welcome!")
-                .font(.largeTitle)
-                .fontWeight(.bold)
+        ZStack {
+            // Modern gradient background
+            LinearGradient(
+                gradient: Gradient(colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.6)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
             
-            Text("You have successfully logged in.")
-                .font(.title3)
-                .foregroundColor(.gray)
+            // Blur effect overlay
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .ignoresSafeArea()
             
-            // Logout button
-            Button(action: {
-                // In a real app, this would clear authentication state
-                presentationMode.wrappedValue.dismiss()
-            }) {
-                Text("Logout")
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.red)
-                    .cornerRadius(10)
-                    .shadow(radius: 5)
+            VStack(spacing: 30) {
+                // Welcome Section
+                VStack(spacing: 12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 60))
+                        .foregroundColor(.green)
+                        .symbolEffect(.bounce)
+                    
+                    Text("Welcome Back!")
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundColor(.primary)
+                    
+                    Text("You've successfully signed in")
+                        .font(.title3)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.top, 60)
+                
+                Spacer()
+                
+                // Action Buttons
+                VStack(spacing: 16) {
+                    // Profile Button
+                    Button(action: {
+                        // Handle profile action
+                    }) {
+                        HStack {
+                            Image(systemName: "person.fill")
+                            Text("View Profile")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                        }
+                        .foregroundColor(.primary)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(.background)
+                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+                        )
+                    }
+                    
+                    // Settings Button
+                    Button(action: {
+                        // Handle settings action
+                    }) {
+                        HStack {
+                            Image(systemName: "gear")
+                            Text("Settings")
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                        }
+                        .foregroundColor(.primary)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(.background)
+                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+                        )
+                    }
+                    
+                    // Logout Button
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Text("Sign Out")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(Color.red)
+                                    .shadow(color: Color.red.opacity(0.3), radius: 8, x: 0, y: 4)
+                            )
+                    }
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 40)
             }
-            .padding(.horizontal)
         }
-        .padding()
         .navigationBarBackButtonHidden(true)
     }
 }
 
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
-    }
+#Preview {
+    HomeView()
 }
